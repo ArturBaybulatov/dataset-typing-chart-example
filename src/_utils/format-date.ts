@@ -1,6 +1,7 @@
-export const formatDate = (date: Date): string =>
+export const formatDate = (date: Date, style?: 'compact'): string =>
   date.toLocaleString('en', {
-    year: 'numeric',
-    month: 'long',
+    year:
+      date.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
+    month: style === 'compact' ? 'short' : 'long',
     day: 'numeric',
   });

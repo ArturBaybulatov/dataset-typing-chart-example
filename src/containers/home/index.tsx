@@ -1,51 +1,65 @@
 import * as dateFns from 'date-fns';
 import _ from 'lodash';
-import {Dataset} from 'src/_types';
+import {LineChart} from 'src/_components';
+import {Dataset, YAxis} from 'src/_types';
 import {formatNumber} from 'src/_utils';
-import {Table} from './_components';
-import {Item} from './_types';
+import {User, UserChartXAxisTypes, UserChartYAxisTypes} from './_types';
 import $ from './index.module.scss';
 
-const dataset: Dataset<Item> = {
+const yAxes: {
+  [Key in keyof UserChartYAxisTypes]: YAxis<UserChartYAxisTypes, Key>;
+} = {
+  numberAxis: {
+    id: 'numberAxis',
+    stroke: 'blue',
+  },
+  percentAxis: {
+    format: num => formatNumber(num, 'percent'),
+    id: 'percentAxis',
+    stroke: 'indigo',
+  },
+};
+
+const userDataset: Dataset<User, UserChartXAxisTypes, UserChartYAxisTypes> = {
   fields: {
+    date: {
+      id: 'date',
+      name: 'Date',
+    },
     id: {
-      align: 'right',
       id: 'id',
       name: 'ID',
     },
-    joined: {
-      id: 'joined',
-      name: 'Join Date',
-    },
     revenue: {
-      align: 'right',
       id: 'revenue',
       name: 'Revenue',
+      yAxisId: 'numberAxis',
     },
     revenueRate: {
-      align: 'right',
       format: num => formatNumber(num, 'percent'),
       id: 'revenueRate',
       name: 'Revenue Rate',
-    },
-    username: {
-      id: 'username',
-      name: 'Username',
+      yAxisId: 'percentAxis',
     },
   },
   id: '1',
   items: _.times(10, i => ({
+    date: dateFns.subDays(new Date(), _.random(30)),
     id: i.toString(),
-    joined: dateFns.subDays(new Date(), _.random(30)),
     revenue: _.random(1_000_000),
-    revenueRate: _.random(1, true),
-    username: `${_.sample(['Alice', 'Bob', 'John', 'Jane', 'Carl'])}${i}`,
+    revenueRate: Math.random(),
   })),
   name: 'Lorem Ipsum',
+  xAxes: {
+    dateAxis: {
+      fieldId: 'date',
+      id: 'dateAxis',
+    },
+  },
 };
 
 export const Home = () => (
   <div className={$.root}>
-    <Table dataset={dataset} />
+    <LineChart datasets={[userDataset]} legend tooltip yAxes={yAxes} />
   </div>
 );

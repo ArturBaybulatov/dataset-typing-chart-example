@@ -1,7 +1,6 @@
-export type Item = {
+export type User = {
+  date: Date;
   id: string;
-  joined: Date;
   revenue: number;
   revenueRate: number;
-  username: string;
 };
