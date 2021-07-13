@@ -1,0 +1,19 @@
+.table {
+  border-collapse: collapse;
+}
+
+.bodyRow {
+  &:hover {
+    background-color: #ffe;
+  }
+}
+
+.cell {
+  border: 1px solid #ccc;
+  min-width: 5rem;
+  padding: 0.6rem;
+
+  &_align_right {
+    text-align: right;
+  }
+}

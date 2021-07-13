@@ -1,12 +1,10 @@
-import 'antd/dist/antd.css';
-import 'basscss';
 import {StrictMode} from 'react';
 import {render} from 'react-dom';
-import {App} from './App';
+import {Home} from 'src/containers';
 
 render(
   <StrictMode>
-    <App />
+    <Home />
   </StrictMode>,
   document.getElementById('root'),
 );
