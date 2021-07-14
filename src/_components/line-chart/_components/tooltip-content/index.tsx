@@ -1,16 +1,19 @@
-import {Dataset} from 'src/_types';
+import {BaseItem, Dataset, Fields} from 'src/_types';
+import {KeyOf} from 'src/_types/utility';
 import {format} from 'src/_utils';
 import $ from './index.module.scss';
 
-type Props<Item, XAxisTypes, YAxisTypes> = {
-  datasets: Array<Dataset<Item, XAxisTypes, YAxisTypes>>;
+type Props<Item extends BaseItem, YAxisTypes> = {
+  datasets: Array<Dataset<Item>>;
+  fields: Fields<Item, YAxisTypes>;
   payload: any;
 };
 
-export const TooltipContent = <Item, XAxisTypes, YAxisTypes>({
+export const TooltipContent = <Item extends BaseItem, YAxisTypes>({
   datasets,
+  fields,
   payload,
-}: Props<Item, XAxisTypes, YAxisTypes>) => (
+}: Props<Item, YAxisTypes>) => (
   <div className={$.root}>
     {datasets.map(dataset => (
       <div key={dataset.id} style={{marginBottom: '0.2rem'}}>
@@ -23,14 +26,14 @@ export const TooltipContent = <Item, XAxisTypes, YAxisTypes>({
               fieldId,
             }: {
               datasetId: string; // Dataset<Item…>['id']
-              fieldId: keyof Item;
+              fieldId: KeyOf<Item>;
             } = JSON.parse(compoundKey);
 
             if (dataset.id !== datasetId) {
               return null;
             }
 
-            const field = dataset.fields[fieldId];
+            const field = fields[fieldId];
 
             return (
               <div key={field.id.toString()}>

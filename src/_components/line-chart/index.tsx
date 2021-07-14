@@ -11,33 +11,37 @@ import {
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from 'recharts';
-import {Dataset, YAxis} from 'src/_types';
+import {BaseItem, Dataset, Fields, XAxes, YAxes} from 'src/_types';
 import {format} from 'src/_utils';
 import {TooltipContent} from './_components';
 import {adaptDatasets} from './_utils';
 import $ from './index.module.scss';
 
-type Props<Item, XAxisTypes, YAxisTypes> = {
+type Props<Item extends BaseItem, XAxisTypes, YAxisTypes> = {
   className?: string;
-  datasets: Array<Dataset<Item, XAxisTypes, YAxisTypes>>;
+  datasets: Array<Dataset<Item>>;
+  fields: Fields<Item, YAxisTypes>;
   legend?: boolean;
   style?: CSSProperties;
   tooltip?: boolean;
-  yAxes: {[Key in keyof YAxisTypes]: YAxis<YAxisTypes, Key>};
+  xAxes: XAxes<Item, XAxisTypes>;
+  yAxes: YAxes<YAxisTypes>;
 };
 
-export const LineChart = <Item, XAxisTypes, YAxisTypes>({
+export const LineChart = <Item extends BaseItem, XAxisTypes, YAxisTypes>({
   className,
   datasets,
+  fields,
   legend,
   style,
   tooltip,
+  xAxes,
   yAxes,
 }: Props<Item, XAxisTypes, YAxisTypes>) => (
   <div className={cn($.root, className)} style={style}>
     <ResponsiveContainer>
       <RechartsLineChart
-        data={adaptDatasets(datasets)}
+        data={adaptDatasets(datasets, fields)}
         // @ts-ignore
         fontSize="0.7rem"
         style={{fontSize: '0.7rem'}}
@@ -45,7 +49,7 @@ export const LineChart = <Item, XAxisTypes, YAxisTypes>({
         <CartesianGrid />
 
         {datasets.map((dataset, datasetIndex) =>
-          _.map(dataset.xAxes, xAxis => (
+          _.map(xAxes, xAxis => (
             <RechartsXAxis
               key={`xAxisKey_${dataset.id}_${xAxis.id}`}
               dataKey={JSON.stringify({
@@ -96,13 +100,19 @@ export const LineChart = <Item, XAxisTypes, YAxisTypes>({
                 return null;
               }
 
-              return <TooltipContent datasets={datasets} payload={payload} />;
+              return (
+                <TooltipContent
+                  datasets={datasets}
+                  fields={fields}
+                  payload={payload}
+                />
+              );
             }}
           />
         )}
 
         {datasets.map((dataset, datasetIndex) =>
-          _.map(dataset.fields, field => (
+          _.map(fields, field => (
             <Line
               key={`key_${dataset.id}_${field.id}`}
               dataKey={JSON.stringify({
@@ -110,6 +120,7 @@ export const LineChart = <Item, XAxisTypes, YAxisTypes>({
                 fieldId: field.id,
               })}
               dot={false}
+              hide={field.yAxisId === undefined}
               isAnimationActive={false}
               stroke={field.yAxisId && yAxes[field.yAxisId].stroke}
               strokeDasharray={
@@ -119,11 +130,7 @@ export const LineChart = <Item, XAxisTypes, YAxisTypes>({
               }
               strokeWidth="2px"
               type="monotone"
-              xAxisId={
-                /*field.xAxisId
-                  ? `xAxisId_${dataset.id}_${field.xAxisId}`
-                  :*/ '__specialXAxisId__'
-              }
+              xAxisId="__specialXAxisId__"
               yAxisId={
                 field.yAxisId
                   ? `yAxisId_${field.yAxisId}`

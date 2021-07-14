@@ -1,4 +1,4 @@
-export type UserChartYAxisTypes = {
+export type UserYAxisTypes = {
   numberAxis: number;
   percentAxis: number;
 };
